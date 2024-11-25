@@ -2,6 +2,16 @@ import os
 import json
 
 
+# Путь к директории сервера Factorio
+FACTORIO_PATH = "../server"
+SAVES_DIR = os.path.join(FACTORIO_PATH, "saves")
+LOG_FILE = os.path.join(FACTORIO_PATH, "factorio.log")
+SETTINGS_FILE = os.path.join(FACTORIO_PATH, "factorio-settings.json")
+WEBSITE_SETTINGS_FILE = "settings.json"
+MODS_DIR = os.path.join(FACTORIO_PATH, "mods")
+
+files = [FACTORIO_PATH, SAVES_DIR, LOG_FILE, SETTINGS_FILE, WEBSITE_SETTINGS_FILE, MODS_DIR]
+
 def get_saves(folder):
     return [a for a in os.listdir(folder) if a.endswith('.zip')]
 
@@ -41,3 +51,42 @@ def update_server_settings(settings_path, data):
     # Сохраняем изменения
     with open(settings_path, 'w', encoding='utf-8') as file:
         json.dump(settings, file, indent=4, ensure_ascii=False)
+
+
+def check_enter(password, login):
+    with open("settings.json", 'r', encoding='utf-8') as file:
+        data = json.load(file)
+        real_password = data["password"]
+        real_login = data["username"]
+
+    if password == real_password and real_login == login:
+        return True
+
+    return False
+
+
+def check_user_valid(username):
+    with open("settings.json", 'r', encoding='utf-8') as file:
+        if username in json.load(file).values():
+            return True
+
+    return False
+
+
+def check_files(files_need):
+    for file in files_need:
+        if not os.path.exists(file):
+            return False
+
+
+def create_missing_files(files_need):
+    for file in files_need:
+        if not os.path.exists(file):
+            if os.path.isfile(file):
+                with open(file, 'w', encoding='utf-8') as file:
+                    pass
+
+            else:
+                os.mkdir(file)
+
+
