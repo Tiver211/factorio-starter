@@ -77,7 +77,7 @@ def start_server():
     # Запуск сервера
     server_process = subprocess.Popen(
         [
-            "./factorio",
+            "sudo ./factorio/bin/x64/factorio",
             "--start-server", save_path,
             "--server-settings", os.path.join(FACTORIO_PATH, "server-settings.json")
         ],
