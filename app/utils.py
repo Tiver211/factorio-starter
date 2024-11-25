@@ -89,6 +89,9 @@ def create_missing_files(files_need):
                                   "password": "password123",
                                   "secretkey": "test1324"
                                             }))
+
+                    elif file == SETTINGS_FILE:
+                        f.write(json.dumps({}))
                     pass
 
             else:
