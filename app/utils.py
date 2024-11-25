@@ -122,7 +122,6 @@ def start_factorio_server(save_path: str, config_path: str, log_path: str):
     try:
         # Команда для запуска сервера
         command = [
-            "sudo",
             "factorio",  # Убедитесь, что сервер Factorio добавлен в PATH или укажите полный путь к исполняемому файлу
             "--start-server", save_path,
             "--server-settings", config_path,
