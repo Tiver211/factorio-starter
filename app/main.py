@@ -87,6 +87,13 @@ def start_server():
         bufsize=1                # Вывод построчно,
     )
     status = True
+
+    with open(LOG_FILE, "a", encoding="utf-8") as log_file:
+        # Записываем заголовок с текущей датой и временем
+        log_file.write(f"\n=== Сервер запущен: {datetime.now()} ===\n")
+
+    log_server_output(server_process)
+
     return jsonify({"message": f"Сервер запущен с сейвом {save_name}"})
 
 
