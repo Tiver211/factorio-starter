@@ -81,7 +81,7 @@ def check_files(files_need):
 def create_missing_files(files_need):
     for file in files_need:
         if not os.path.exists(file):
-            if len(file.split(".")) >= 2:
+            if is_file_path(file):
                 with open(file, 'w', encoding='utf-8') as f:
                     if file == 'settings.json':
                         f.write(json.dumps({
@@ -95,3 +95,12 @@ def create_missing_files(files_need):
                 os.mkdir(file)
 
 
+def is_file_path(path):
+    # Считаем, что файл имеет расширение, отделённое точкой
+    # И путь не заканчивается на `/` или `\`, что характерно для директорий
+    if not path or path.endswith(('/', '\\')):
+        return False  # Путь явно выглядит как директория
+    # Проверим на наличие расширения
+    if '.' in path.split('/')[-1]:  # Берём последнюю часть пути и ищем в ней точку
+        return True
+    return False
