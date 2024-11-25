@@ -7,9 +7,7 @@ from flask_login import LoginManager, UserMixin, login_user, login_required, log
 from utils import *
 
 app = Flask(__name__)
-with open("settings.json", "r") as f:
-    secrets = json.load(f)["secretkey"]
-app.secret_key = secrets
+
 
 
 # Путь к директории сервера Factorio
@@ -25,6 +23,10 @@ files = [FACTORIO_PATH, SAVES_DIR, LOG_FILE, SETTINGS_FILE, WEBSITE_SETTINGS_FIL
 if not check_files(files):
     print("Something went wrong")
     create_missing_files(files)
+
+with open("settings.json", "r") as f:
+    secrets = json.load(f)["secretkey"]
+app.secret_key = secrets
 
 # Хранение текущего процесса сервера
 server_process = None
