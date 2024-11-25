@@ -111,7 +111,6 @@ def is_file_path(path):
     return False
 
 
-
 def start_factorio_server(save_path: str, config_path: str, log_path: str):
     """
     Запускает сервер Factorio с указанными аргументами.
@@ -132,8 +131,18 @@ def start_factorio_server(save_path: str, config_path: str, log_path: str):
         # Запуск сервера
         process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
-        print(f"Сервер Factorio запущен. PID: {process.pid}")
-        return process  # Вернем объект процесса для управления, если нужно
+        stdout, stderr = process.communicate()
+
+        # Печатаем вывод и ошибки
+        print(f"Вывод из stdout:\n{stdout.decode('utf-8')}")
+        print(f"Ошибки из stderr:\n{stderr.decode('utf-8')}")
+
+        if process.returncode != 0:
+            print(f"Ошибка при запуске сервера, код завершения: {process.returncode}")
+        else:
+            print(f"Сервер Factorio успешно запущен. PID: {process.pid}")
+
+        return process  # Вернем объект процесса для дальнейшего контроля
     except FileNotFoundError:
         print("Ошибка: исполняемый файл Factorio не найден. Проверьте, установлен ли сервер и добавлен ли путь к нему.")
     except Exception as e:
