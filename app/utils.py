@@ -111,32 +111,6 @@ def is_file_path(path):
     return False
 
 
-def log_server_output(process):
-    """Функция для записи логов из stdout и stderr процесса."""
-    try:
-        with open(LOG_FILE, "a", encoding="utf-8") as log_file:
-            log_file.write(f"\n=== Сервер запущен: {datetime.now()} ===\n")
-
-            while True:
-                output = process.stdout.readline()
-                if output:
-                    print(output, end="")
-                    log_file.write(output)
-
-                error = process.stderr.readline()
-                if error:
-                    error_message = f"Ошибка: {error}"
-                    print(error_message, end="")
-                    log_file.write(error_message)
-
-                if process.poll() is not None:  # Если процесс завершился
-                    log_file.write("\nСервер завершил работу.\n")
-                    print("Сервер завершил работу.")
-                    break
-    except Exception as e:
-        with open(LOG_FILE, "a", encoding="utf-8") as log_file:
-            log_file.write(f"Ошибка: {e}\n")
-        print(f"Ошибка: {e}")
 
 def start_factorio_server(save_path: str, config_path: str, log_path: str):
     """
