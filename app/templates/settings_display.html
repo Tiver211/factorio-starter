@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Настройки сервера Factorio</title>
+</head>
+<body>
+    <h1>Настройки сервера Factorio</h1>
+
+    <!-- Таблица настроек -->
+    <form method="POST" action="/">
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>Ключ</th>
+                    <th>Значение</th>
+                    <th>Действия</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for key, value in settings.items() %}
+                <tr>
+                    <td>{{ key }}</td>
+                    <td>
+                            <!-- Поля для редактирования простых значений -->
+                        <input type="text" name="{{ key }}" value="{{ value }}">
+
+                    </td>
+                    <td>
+                        <!-- Кнопка для удаления ключа -->
+                        <a href="/settings/delete/{{ key }}" onclick="return confirm('Удалить {{ key }}?')">Удалить</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <button type="submit" formaction="/settings">Сохранить изменения</button>
+    </form>
+
+    <hr>
+
+    <!-- Форма для добавления нового ключа -->
+    <h2>Добавить настройку</h2>
+    <form method="POST" action="/settings/add">
+        <label for="new_key">Ключ:</label>
+        <input type="text" id="new_key" name="new_key" required>
+        <label for="new_value">Значение:</label>
+        <input type="text" id="new_value" name="new_value" required>
+        <button type="submit">Добавить</button>
+    </form>
+
+    <hr>
+
+    <form action="/">
+        <input type="submit" value="вернуться на главную" />
+    </form>
+</body>
+</html>

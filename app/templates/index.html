@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href=/static/index.css>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Factorio Server</title>
+</head>
+<body>
+    <h1>Добро пожаловать на сервер Factorio!</h1>
+    {% if status %}
+        <p>Текущее состояние: включен</p>
+        <form action="/stop" method="post">
+                <button type="submit" value="выключить"></button>
+        </form>
+
+    {% else %}
+                <p>Текущее состояние: выключен</p>
+    {% endif %}
+
+    <h2>Доступные сохранения:</h2>
+    <ul class="container">
+        {% for save in saves %}
+            <li>{{ save }}
+            {% if not status %}
+                <form action="/start" method="post">
+                    <input type="hidden" name="save" value={{ save }}>
+                    <button type="submit"  >включить с этим сейвом</button>
+                </form>
+            {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
+    <form action="/settings">
+        <input type="submit" value="просмотреть настройки" />
+    </form>
+</body>
+</html>
