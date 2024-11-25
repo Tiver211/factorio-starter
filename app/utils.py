@@ -1,5 +1,6 @@
 import os
 import json
+import subprocess
 from datetime import datetime
 
 # Путь к директории сервера Factorio
@@ -136,3 +137,30 @@ def log_server_output(process):
         with open(LOG_FILE, "a", encoding="utf-8") as log_file:
             log_file.write(f"Ошибка: {e}\n")
         print(f"Ошибка: {e}")
+
+def start_factorio_server(save_path: str, config_path: str, log_path: str):
+    """
+    Запускает сервер Factorio с указанными аргументами.
+
+    :param save_path: Путь к файлу сохранения (сейву).
+    :param config_path: Путь к файлу настроек сервера.
+    :param log_path: Путь для записи логов сервера.
+    """
+    try:
+        # Команда для запуска сервера
+        command = [
+            "factorio",  # Убедитесь, что сервер Factorio добавлен в PATH или укажите полный путь к исполняемому файлу
+            "--start-server", save_path,
+            "--server-settings", config_path,
+            "--console-log", log_path
+        ]
+
+        # Запуск сервера
+        process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+        print(f"Сервер Factorio запущен. PID: {process.pid}")
+        return process  # Вернем объект процесса для управления, если нужно
+    except FileNotFoundError:
+        print("Ошибка: исполняемый файл Factorio не найден. Проверьте, установлен ли сервер и добавлен ли путь к нему.")
+    except Exception as e:
+        print(f"Ошибка при запуске сервера: {e}")
