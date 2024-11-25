@@ -81,9 +81,10 @@ def start_server():
             "--start-server", save_path,
             "--server-settings", os.path.join(FACTORIO_PATH, "server-settings.json")
         ],
-        cwd=FACTORIO_PATH,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE
+        stdout=subprocess.PIPE,  # Перенаправление stdout
+        stderr=subprocess.PIPE,  # Перенаправление stderr
+        text=True,               # Чтение строк вместо байтов
+        bufsize=1                # Вывод построчно,
     )
     status = True
     return jsonify({"message": f"Сервер запущен с сейвом {save_name}"})
