@@ -1,7 +1,6 @@
 import os
 import json
 
-
 # Путь к директории сервера Factorio
 FACTORIO_PATH = "../server"
 SAVES_DIR = os.path.join(FACTORIO_PATH, "saves")
@@ -82,8 +81,14 @@ def check_files(files_need):
 def create_missing_files(files_need):
     for file in files_need:
         if not os.path.exists(file):
-            if os.path.isfile(file):
-                with open(file, 'w', encoding='utf-8') as file:
+            if len(file.split(".")) >= 2:
+                with open(file, 'w', encoding='utf-8') as f:
+                    if file == 'settings.json':
+                        f.write(json.dumps({
+                                  "username": "admin",
+                                  "password": "password123",
+                                  "secretkey": "test1324"
+                                            }))
                     pass
 
             else:
