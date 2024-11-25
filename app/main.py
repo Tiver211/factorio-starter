@@ -1,23 +1,43 @@
 from flask import Flask, request, jsonify, send_from_directory, render_template, redirect, url_for
 import subprocess
 import os
+
+from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
+
 from utils import *
 
 app = Flask(__name__)
+with open("settings.json", "r") as f:
+    secrets = json.load(f)["secretkey"]
+app.secret_key = secrets
+
 
 # Путь к директории сервера Factorio
 FACTORIO_PATH = "../server"
 SAVES_DIR = os.path.join(FACTORIO_PATH, "saves")
 LOG_FILE = os.path.join(FACTORIO_PATH, "factorio.log")
 SETTINGS_FILE = os.path.join(FACTORIO_PATH, "factorio-settings.json")
+WEBSITE_SETTINGS_FILE = "settings.json"
+MODS_DIR = os.path.join(FACTORIO_PATH, "mods")
+
+files = [FACTORIO_PATH, SAVES_DIR, LOG_FILE, SETTINGS_FILE, WEBSITE_SETTINGS_FILE, MODS_DIR]
+
+if not check_files(files):
+    print("Something went wrong")
+    create_missing_files(files)
 
 # Хранение текущего процесса сервера
 server_process = None
 status = False
 
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'login'
+
 
 # Главная страница
 @app.route("/")
+@login_required
 def home():
     # Пример данных
     if not status:
@@ -37,6 +57,7 @@ def home():
 
 # Запуск сервера
 @app.route("/start", methods=["POST"])
+@login_required
 def start_server():
     global status
     global server_process
@@ -68,6 +89,7 @@ def start_server():
 
 # Остановка сервера
 @app.route("/stop", methods=["POST"])
+@login_required
 def stop_server():
     global status
     global server_process
@@ -82,6 +104,7 @@ def stop_server():
 
 # Список доступных сейвов
 @app.route("/saves", methods=["GET"])
+@login_required
 def list_saves():
     saves = get_saves(SAVES_DIR)
     return jsonify({"saves": saves})
@@ -89,6 +112,7 @@ def list_saves():
 
 # Логи сервера
 @app.route("/logs", methods=["GET"])
+@login_required
 def get_logs():
     if not os.path.exists(LOG_FILE):
         return jsonify({"error": "Лог-файл не найден"}), 404
@@ -100,6 +124,7 @@ def get_logs():
 
 # Загрузка нового сейва
 @app.route("/upload", methods=["POST"])
+@login_required
 def upload_save():
     if "file" not in request.files:
         return jsonify({"error": "Файл не найден в запросе"}), 400
@@ -115,6 +140,7 @@ def upload_save():
 
 
 @app.route("/settings", methods=["GET", "POST"])
+@login_required
 def show_settings():
     if request.method == "POST":
         # Получаем данные из формы
@@ -139,6 +165,7 @@ def show_settings():
     return render_template("settings_display.html", settings=settings)
 
 @app.route("/settings/add", methods=["POST"])
+@login_required
 def add_setting():
     """Добавляет новый ключ и значение."""
     key = request.form.get("new_key")
@@ -160,6 +187,7 @@ def add_setting():
     return redirect(url_for("show_settings"))
 
 @app.route("/settings/delete/<key>")
+@login_required
 def delete_setting(key):
     """Удаляет указанный ключ."""
     settings = read_server_settings(SETTINGS_FILE)
@@ -171,6 +199,35 @@ def delete_setting(key):
 
     return redirect(url_for("show_settings"))
 
+
+@app.route("/login", methods=["POST", "GET"])
+def login():
+    if request.method == "POST":
+        if check_enter(request.form.get("password"), request.form.get("username")):
+            user = User(request.form.get("username"))
+            login_user(user)
+            return redirect("/")
+        return 'Неверные данные!'
+
+    return render_template("login.html")
+
+@login_manager.user_loader
+def load_user(user_id):
+    if check_user_valid(user_id):
+        return User(user_id)
+    return None
+
+
+class User(UserMixin):
+    def __init__(self, id):
+        self.id = id
+
+
+@app.route('/logout', methods=['POST'])
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('login'))
 
 
 # Запуск приложения
