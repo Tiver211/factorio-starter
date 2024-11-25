@@ -75,17 +75,7 @@ def start_server():
         return jsonify({"error": "Сервер уже запущен"}), 400
 
     # Запуск сервера
-    server_process = subprocess.Popen(
-        [
-            "sudo", "/home/tiver211/factorio/bin/x64/factorio",
-            "--start-server", save_path,
-            "--server-settings", os.path.join(FACTORIO_PATH, "server-settings.json")
-        ],
-        stdout=subprocess.PIPE,  # Перенаправление stdout
-        stderr=subprocess.PIPE,  # Перенаправление stderr
-        text=True,               # Чтение строк вместо байтов
-        bufsize=1                # Вывод построчно,
-    )
+    server_process = start_factorio_server(save_path, SETTINGS_FILE, LOG_FILE)
     status = True
 
     with open(LOG_FILE, "a", encoding="utf-8") as log_file:
